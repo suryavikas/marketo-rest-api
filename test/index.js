@@ -6,7 +6,7 @@ var expect = require('chai').expect(),
   should = require('chai').should(),
   assert = require('assert'),
   marketo = require('../index'),
-  test = require('./sample.json');
+  test = require('./test.json');
 
 if (test.clientId==='' || test.clientId==='xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'){
   console.log('To run the proper test, please update all of your Marketo API variables inside "./test/test.json" file.');
@@ -15,9 +15,9 @@ if (test.clientId==='' || test.clientId==='xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
 
 // start test
 describe('marketo-rest-api', function() {
-
+ 
   // set timeout of each request to 10 seconds
-  this.timeout(10000);
+  this.timeout(30000);
 
   // test init
   describe('marketo.init(options, callback)', function() {
@@ -114,6 +114,100 @@ describe('marketo-rest-api', function() {
 
   });
 
+  // test synLead
+  describe('marketo.syncCustomObjects(options, callback)', function() {
+    
+    var optionsLead = {
+        'process': 'update',
+        'email': 'marketo.api.test+1@gmail.com', 
+        "lookupField": "email",
+        'path': 'lead',
+        'method': 'POST',
+        'process': 'update',
+        'lookupField': 'email',
+        'input': {
+          'firstName': 'Test_jerry',
+          'lastName': 'Microsite 13  0917',
+          'email': 'marketo.api.test+1@gmail.com',
+          'gender': 'Male',
+          'dateOfBirth': '1478-09-13',
+          'mailingAddress1': '639 Peak Road RD 2 Peak Road',
+          'mailingAddress2': 'Helensville',
+          'mailingAddress3': 'Helensville',
+          'mailingAddress4': '0875',
+          'cntracc':'ABCD000291569994'          
+        }      
+    }
+    // test delete lead
+    var optionsCustom = {
+      'debug': test.debug,
+      'process': 'update',
+      'path': 'contract_c',
+      //"lookupField": "contractNumber",           
+      'input':{
+        'cntracc': 'ABCD000291569994',
+        'icp': '99999999999999999999A',
+        'starshipAmount': '20',
+        'onlineBillRegd': 'Y',
+        'contractNumber':'ABCD000291569994',
+        'contractEndDate': '2049-01-01'
+      }
+      
+    };
+    // test delete custom object
+    var optionsCustomDelete = {
+      'debug': test.debug,
+      'process': 'remove',
+      'path': 'contract_c',
+      "lookupField": "dedupeFields",      
+      'input':{
+        "contractNumber":"ABCD000291569994",
+        "contractenddate":"2049-01-01",
+        "cntracc":"ABCD000291569994"       
+      }
+      
+    };
+    it('creating a lead, ' + JSON.stringify(optionsLead), function(done) {
+      assert.doesNotThrow(function() {        
+        marketo.syncLead(optionsLead, function(response){
+          console.log(response.body);
+          response.success.should.equal(true);         
+          done();
+          
+        }, 
+        function(err) {
+          if (err) throw err; 
+          done(); 
+        });
+      });
+    });
+    it('creating a custom object, ' + JSON.stringify(optionsCustom), function(done) {
+      assert.doesNotThrow(function() {        
+        marketo.syncCustomObjects(optionsCustom, function(response){
+          console.log(response.body);
+          response.success.should.equal(true);         
+          done();
+        }, 
+        function(err) {
+          if (err) throw err; 
+          done(); 
+        });
+      });
+    });
+    it('deleting a custom object, ' + JSON.stringify(optionsLead), function(done) {
+      assert.doesNotThrow(function() {        
+        marketo.syncCustomObjects(optionsCustomDelete, function(response){
+          console.log(response.body);
+          response.success.should.equal(true);         
+          done();
+        }, 
+        function(err) {
+          if (err) throw err; 
+          done(); 
+        });
+      });
+    });
+  });
   // test email send
   describe('marketo.sendEmail(options, callback)', function() {
     var options = {

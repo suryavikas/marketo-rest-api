@@ -147,6 +147,41 @@ exports.scheduleCampaign = function (options, callback) {
 };
 
 /*
+  syncLead(options, callback);
+  Sync leads on Marketo lead database and associates the lead to Marketo list.
+
+  Example:
+  var options: {
+    'process': 'add' || 'update' || 'remove',
+    'list': 'listname from 'lists':{...} in init()',
+    'input': {
+      'email': 'user@email.com',
+      'firstName': 'John',
+      'lastName': 'Doe',
+      'title': 'Techie',
+      'phone': '1112223333',
+      'company': 'John Doe Company',
+      'custom_field_1': 'custom_value_1',
+      'custom_field_2': 'custom_value_2',
+      ...
+    }
+  }
+  marketo.syncLead(options, function(response){
+    console.log(response);
+  });
+
+  Success:
+  { 'success':true, 'message':'Lead Id ___ is successfully added to Marketo.' }
+
+  Error:
+  { 'success':false, 'error':'Error message.' }
+*/
+exports.syncCustomObjects = function (options, callback) {
+  if(options.debug) console.log(options);
+  authenticate(processSyncCustomObject, options, callback);
+};
+
+/*
   Associates lead with marketo cookie
   http://developers.marketo.com/documentation/rest/associate-lead/
 */
@@ -603,6 +638,98 @@ var requestCampaign = function (campaignId, leadId, tokens, callback){
         response.success = false;
         response.error = error;
         response.message = 'Marketo Request Campaign API failed.';
+        callback(response);
+      }
+  });
+};
+
+
+/*
+  After authenticated with Marketo API, execute lead sync job using Marketo API.
+
+  For add & update lead,
+    1) add or update lead
+    2) add lead to list
+  For remove lead,
+    1) get lead id
+    2) remove lead
+    3) remove lead from list
+*/
+var processSyncCustomObject = function (options, callback){  
+  switch(options.process.toLowerCase()){
+    case 'add':
+    case 'update':
+      // 1) add or update lead
+      addOrUpdateCustomObject(options, function(response){
+        if(options.debug) console.log('addOrUpdate'+options.path+':' + response.success);
+        callback(response);        
+      });
+      break;
+
+    case 'remove':      
+      deleteCustomObject(options, function(response){
+        if (options.debug) console.log('delete' + options.path + ':' + response.success);
+        callback(response);
+        
+      });      
+      break;
+  }
+};
+
+var addOrUpdateCustomObject = function (options, callback){
+  var url = restEndpoint + 'rest/v1/customobjects/' +options.path+'.json?access_token=' + accessToken;
+  var data = {
+    'action': 'createOrUpdate',
+    'lookupField': options.lookupField || 'email',
+    'input': [options.input]
+  };
+
+  request({
+    method: 'POST',
+    headers: header(),
+    url: url,
+    body: data,
+    json: true,
+  }, function (error, response, body) {
+      if (!error && response.statusCode === 200 && !_.isEmpty(body) && body.success === true && body.result[0].marketoGUID &&  (response.body.result[0].status === 'created' || response.body.result[0].status === 'updated')) {
+        response.success = true;
+        // response.leadId = body.result[0].id;
+        callback(response);
+      }
+      else{
+        response = response || {};
+        response.success = false;
+        response.error = error;
+        response.message = 'Marketo Add & Edit Lead API failed.';
+        callback(response);
+      }
+  });
+};
+
+var deleteCustomObject = function (options, callback){
+  var url = restEndpoint + 'rest/v1/customobjects/' +options.path+'/delete.json?access_token=' + accessToken;
+  var data = {    
+    'deleteBy': options.lookupField || 'email',
+    'input': [options.input]
+  };
+
+  request({
+    method: 'POST',
+    headers: header(),
+    url: url,
+    body: data,
+    json: true,
+  }, function (error, response, body) {
+      if (!error && response.statusCode === 200 && !_.isEmpty(body) && body.success === true && !_.isEmpty(body.result[0].marketoGUID) &&  response.body.result[0].status === 'deleted') {
+        response.success = true;
+        // response.leadId = body.result[0].id;
+        callback(response);
+      }
+      else{
+        response = response || {};
+        response.success = false;
+        response.error = error;
+        response.message = 'Marketo Add & Edit Lead API failed.';
         callback(response);
       }
   });
