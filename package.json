@@ -1,7 +1,7 @@
 {
   "name": "marketo-rest-api",
-  "version": "0.2.0",
-  "description": "NodeJs interface for Marketo REST API. Syncs leads and sends email campaigns via Marketo platform.",
+  "version": "0.3.0",
+  "description": "NodeJs interface for Marketo REST API. Syncs leads, custom objects and sends email campaigns via Marketo platform.",
   "main": "index.js",
   "scripts": {
     "test": "./node_modules/.bin/mocha --reporter spec"
