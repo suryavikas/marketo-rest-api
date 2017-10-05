@@ -552,7 +552,7 @@ var addOrUpdateLead = function (options, callback){
   
   //Check if user wants to load this lead in a partition 
   if(checkIfPartitionIsPassed(options)) {
-    data.partition = options.partition;
+    data.partitionName = options.partition;
   }
 
   request({
