@@ -549,6 +549,11 @@ var addOrUpdateLead = function (options, callback){
     'input': [options.input]
   };
   data.input[0].email = options.email;
+  
+  //Check if user wants to load this lead in a partition 
+  if(checkIfPartitionIsPassed(options)) {
+    data.partition = options.partition;
+  }
 
   request({
     method: 'POST',
@@ -679,7 +684,7 @@ var processSyncCustomObject = function (options, callback){
 var addOrUpdateCustomObject = function (options, callback){
   var url = restEndpoint + 'rest/v1/customobjects/' +options.path+'.json?access_token=' + accessToken;
   var data = {
-    'action': 'createOrUpdate',
+    'action': 'createOrUpdate',    
     'lookupField': options.lookupField || 'email',
     'input': [options.input]
   };
@@ -734,3 +739,12 @@ var deleteCustomObject = function (options, callback){
       }
   });
 };
+
+var checkIfPartitionIsPassed = function(options) {
+  var status = false;
+  if(options.partition != 'undefined') {
+    status = true;
+  }
+
+  return status;
+}

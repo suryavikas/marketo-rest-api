@@ -35,7 +35,7 @@ describe('marketo-rest-api', function() {
     });
   });  
 
-  // test synLead
+ /*  // test synLead
   describe('marketo.syncLead(options, callback)', function() {
     
     // test delete lead
@@ -112,7 +112,7 @@ describe('marketo-rest-api', function() {
       });
     });
 
-  });
+  }); */
 
   // test synLead
   describe('marketo.syncCustomObjects(options, callback)', function() {
@@ -125,6 +125,7 @@ describe('marketo-rest-api', function() {
         'method': 'POST',
         'process': 'update',
         'lookupField': 'email',
+        'partition': 'Prospects',
         'input': {
           'firstName': 'Test_jerry',
           'lastName': 'Microsite 13  0917',
@@ -208,7 +209,7 @@ describe('marketo-rest-api', function() {
       });
     });
   });
-  // test email send
+ /*  // test email send
   describe('marketo.sendEmail(options, callback)', function() {
     var options = {
       'debug': test.debug,
@@ -236,13 +237,13 @@ describe('marketo-rest-api', function() {
       'campaign': 'campaignname_2',
       'input': {
         'runAt': '2017-12-25T00:00:00.000Z'
-        /*
-        // including token examples below
-        'tokens': [
-          {'name': '{{my.token1_name}}', 'value': 'some value'},
-          {'name': '{{my.token2_name}}', 'value': 'some value'}
-        ]}
-        */
+        
+        // // including token examples below
+        // 'tokens': [
+        //   {'name': '{{my.token1_name}}', 'value': 'some value'},
+        //   {'name': '{{my.token2_name}}', 'value': 'some value'}
+        // ]}
+       
       }
     };
     it('scheduling a campaign, ' + JSON.stringify(options), function(done) {
@@ -259,6 +260,6 @@ describe('marketo-rest-api', function() {
       });
     });
   });
-
+ */
 });
 
