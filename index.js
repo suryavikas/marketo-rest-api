@@ -451,7 +451,7 @@ var header = function () {
   http://developers.marketo.com/documentation/rest/get-multiple-leads-by-filter-type/
 */
 var getLeadId = function (email, callback) {
-  var url = restEndpoint + 'rest/v1/leads.json?access_token=' + accessToken + '&filterType=email&filterValues=' + _.escape(email);
+  var url = restEndpoint + 'rest/v1/leads.json?access_token=' + accessToken + '&filterType=email&filterValues=' + encodeURIComponent(email);
   request({
       method: 'GET',
       headers: header(),
